@@ -48,7 +48,7 @@ meu-chat-websocket/
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/LGustz/meu-chat-websocket.git
+git clone https://github.com/LGustz/Chat-Py-Github.git
 ```
 
 ### 2. Acesse a pasta
