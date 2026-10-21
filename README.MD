@@ -1,38 +1,37 @@
-# 💬 Meu Chat WebSocket
+# 💬 Chat em Tempo Real com Flask-SocketIO
 
-Chat em tempo real desenvolvido com **Python, Flask e Flask-SocketIO**, permitindo que vários usuários conectados recebam mensagens instantaneamente, sem precisar atualizar a página.
+Aplicação web de mensagens em tempo real desenvolvida com **Python, Flask e Flask-SocketIO**, permitindo a comunicação instantânea entre diferentes usuários conectados ao servidor.
 
-O projeto foi criado com o objetivo de aprender os fundamentos da comunicação em tempo real entre clientes e servidores usando eventos e conexões persistentes.
+O projeto utiliza eventos Socket.IO para enviar e distribuir mensagens sem a necessidade de atualizar a página.
 
 ## 🚀 Funcionalidades
 
 - Envio e recebimento de mensagens em tempo real.
-- Comunicação entre vários navegadores conectados.
-- Identificação das mensagens pelo nome do usuário.
-- Interface web simples e responsiva.
-- Reconexão automática do cliente após desconexões.
+- Comunicação entre vários clientes conectados.
+- Identificação das mensagens por nome.
+- Interface web responsiva e simples.
+- Indicador de conexão com o servidor.
+- Reconexão automática após desconexões.
 - Limite de caracteres para nomes e mensagens.
-- Execução local no próprio computador.
-- Possibilidade de publicação em uma hospedagem compatível com Python.
+- Suporte para execução local e hospedagem na internet.
 
 ## 🛠️ Tecnologias utilizadas
 
-| Tecnologia | Finalidade |
-|---|---|
-| Python | Lógica e servidor da aplicação |
-| Flask | Criação da aplicação web |
-| Flask-SocketIO | Comunicação em tempo real |
-| JavaScript | Envio e recebimento de mensagens |
-| HTML5 | Estrutura da interface |
-| CSS3 | Estilização da página |
-| Gunicorn | Servidor de aplicação para publicação |
+- **Python** — lógica e execução do servidor.
+- **Flask** — framework para aplicação web.
+- **Flask-SocketIO** — comunicação em tempo real.
+- **JavaScript** — interação com o servidor.
+- **HTML5 e CSS3** — estrutura e interface.
+- **Gunicorn** — servidor de aplicação para hospedagem.
+- **simple-websocket** — suporte ao transporte WebSocket.
 
-## 📁 Estrutura do projeto
+## 📂 Estrutura do projeto
 
 ```text
 meu-chat-websocket/
 ├── app.py
 ├── requirements.txt
+├── README.md
 └── templates/
     └── index.html
 ```
@@ -40,39 +39,37 @@ meu-chat-websocket/
 ## ⚙️ Requisitos
 
 - Python 3.10 ou superior.
-- Pip instalado.
+- Pip.
 - Navegador atualizado.
-- Conexão com a internet para carregar a biblioteca Socket.IO pelo CDN utilizado na interface.
+- Conexão com a internet para carregar a biblioteca Socket.IO pelo CDN.
 
-## 📥 Instalação
+## 💻 Executando localmente
 
-**1. Clone o repositório**
+### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/SEU-USUARIO/meu-chat-websocket.git
+git clone https://github.com/LGustz/meu-chat-websocket.git
 ```
 
-Substitua `SEU-USUARIO` pelo seu nome de usuário do GitHub.
-
-**2. Entre na pasta**
+### 2. Acesse a pasta
 
 ```bash
 cd meu-chat-websocket
 ```
 
-**3. Instale as dependências**
+### 3. Instale as dependências
 
 ```bash
 py -m pip install -r requirements.txt
 ```
 
-**4. Execute o servidor**
+### 4. Inicie o servidor
 
 ```bash
 py app.py
 ```
 
-**5. Acesse a aplicação**
+### 5. Acesse a aplicação
 
 Abra o navegador e entre em:
 
@@ -80,80 +77,92 @@ Abra o navegador e entre em:
 http://127.0.0.1:5000
 ```
 
-## 🌐 Acesso por outros dispositivos
+Para testar a comunicação em tempo real, abra o endereço em duas abas ou navegadores diferentes.
 
-Para permitir que outros dispositivos da mesma rede local acessem o chat:
+## 🌐 Publicação no Render
 
-1. Execute `ipconfig` no PowerShell.
-2. Localize o IPv4 do computador que está executando o servidor.
-3. No outro dispositivo, abra `http://IP-DO-SERVIDOR:5000`.
+A aplicação pode ser hospedada no Render utilizando o repositório do GitHub.
 
-Exemplo:
+**Configurações de implantação:**
 
-```text
-http://192.168.1.100:5000
-```
+| Configuração | Valor |
+|---|---|
+| Language | Python 3 |
+| Build Command | `pip install -r requirements.txt` |
+| Start Command | `gunicorn --worker-class gthread --workers 1 --threads 100 app:app` |
 
-O endereço acima é apenas ilustrativo. Utilize o IP real do computador servidor.
+### Variáveis de ambiente
 
-O firewall do Windows precisa permitir conexões de entrada na porta TCP 5000 pela rede privada.
+Configure a seguinte variável no painel do Render:
 
-Para acesso externo pela internet, são necessárias configurações adicionais de rede e segurança.
+| Variável | Descrição |
+|---|---|
+| `SECRET_KEY` | Chave secreta da aplicação |
+| `PORT` | Porta fornecida automaticamente pelo ambiente, quando aplicável |
 
-## 🔄 Como funciona a comunicação
+A variável `PORT` é lida pelo código Python na execução direta. No comando Gunicorn acima, o servidor utiliza a porta configurada pelo ambiente de hospedagem.
 
-1. O usuário digita uma mensagem na interface.
+Após concluir a implantação, acesse a URL pública gerada pelo Render.
+
+> **Observação:** o plano gratuito pode apresentar suspensão por inatividade, reinicializações e limitações de recursos. Consulte os planos e limites atuais do provedor.
+
+## 🔄 Como funciona
+
+1. O usuário informa seu nome e digita uma mensagem.
 2. O JavaScript envia os dados ao servidor por meio do evento `mensagem`.
-3. O Flask-SocketIO recebe e valida os dados.
-4. O servidor distribui a mensagem aos clientes conectados.
-5. Os navegadores recebem o evento e atualizam a interface sem recarregar a página.
+3. O Flask-SocketIO recebe os dados e verifica se o nome e a mensagem são válidos.
+4. O servidor distribui a mensagem para os clientes conectados.
+5. Os navegadores recebem o evento e atualizam a interface automaticamente.
 
 ### Fluxo de comunicação
 
 ```text
-Cliente A
-   |
-   | socket.emit("mensagem")
-   v
-Servidor Python
-   |
-   | socketio.emit("mensagem")
-   v
-Clientes conectados
+Navegador A
+     |
+     | socket.emit("mensagem")
+     v
+Servidor Flask-SocketIO
+     |
+     | socketio.emit("mensagem")
+     v
+Navegador A + Navegador B + outros clientes
 ```
 
-## ⚠️ Limitações atuais
+## 📡 Eventos Socket.IO
+
+| Evento | Função |
+|---|---|
+| `connect` | Detecta a conexão de um cliente |
+| `disconnect` | Detecta a desconexão no navegador |
+| `mensagem` | Recebe e distribui mensagens |
+
+O servidor utiliza `socketio.emit()` para enviar as mensagens a todos os clientes conectados.
+
+## ⚠️ Limitações conhecidas
 
 - As mensagens não são armazenadas em banco de dados.
-- Não há cadastro, autenticação ou gerenciamento de usuários.
-- Os nomes são informados livremente pelos participantes.
-- As mensagens não possuem histórico persistente.
-- O servidor precisa estar em execução para que o chat funcione.
-- O acesso público exige configurações adicionais de segurança.
+- Não existe histórico persistente.
+- Não há autenticação ou cadastro de usuários.
+- Os nomes são escolhidos livremente pelos participantes.
+- Não há conversas privadas nem salas.
+- O servidor precisa estar ativo para permitir a comunicação.
 
-Esta versão é destinada ao aprendizado e a testes. Não deve ser exposta diretamente à internet sem medidas de proteção apropriadas.
+**Segurança:** esta versão é destinada a aprendizado e experimentação. Antes de disponibilizá-la para uso público, implemente autenticação, validação adicional, limitação de frequência de mensagens e proteção contra abuso. Configure HTTPS/WSS e uma `SECRET_KEY` forte, armazenada fora do código-fonte.
 
 ## 🔮 Melhorias futuras
 
-- [ ] Cadastro e login de usuários.
+- [ ] Sistema de cadastro e login.
 - [ ] Histórico de mensagens com SQLite ou MySQL.
+- [ ] Salas de conversa.
 - [ ] Conversas privadas.
-- [ ] Salas de bate-papo.
 - [ ] Lista de usuários online.
 - [ ] Indicador de digitação.
 - [ ] Envio de imagens e arquivos.
 - [ ] Interface aprimorada para dispositivos móveis.
-- [ ] Criptografia HTTPS/WSS e controles de segurança.
-- [ ] Notificações de novas mensagens.
+- [ ] Notificações de mensagens.
+- [ ] Controles de segurança e moderação.
 
-## 🎯 Objetivo educacional
+## 🎯 Objetivo do projeto
 
-Este projeto demonstra os fundamentos de aplicações web em tempo real e serve como ponto de partida para estudos de WebSockets, desenvolvimento backend, comunicação cliente-servidor e sistemas de mensagens.
+Projeto educacional desenvolvido para aprender os fundamentos de comunicação em tempo real, programação backend com Python e integração entre navegadores e servidores por meio de Socket.IO.
 
-## 📄 Licença
-
-Este projeto pode ser disponibilizado sob a licença MIT. Para isso, adicione um arquivo `LICENSE` com o texto oficial da licença MIT.
-
----
-
-Desenvolvido como projeto de estudo de **Python e comunicação em tempo real**.
