@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Chat WebSocket</title>
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 15px;
+            background: #f3f4f6;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #mensagens {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            list-style: none;
+        }
+
+        input, button {
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 5px 0;
+            width: 100%;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #status {
+            text-align: center;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Meu Chat</h1>
+
+    <p id="status">Conectando ao servidor...</p>
+
+    <ul id="mensagens"></ul>
+
+    <input id="nome" maxlength="30" placeholder="Seu nome">
+    <input id="texto" maxlength="500" placeholder="Digite sua mensagem">
+
+    <button id="enviar">Enviar mensagem</button>
+
+    <script>
+        const socket = io();
+        const nome = document.getElementById("nome");
+        const texto = document.getElementById("texto");
+        const mensagens = document.getElementById("mensagens");
+        const status = document.getElementById("status");
+
+        socket.on("connect", () => {
+            status.textContent = "Conectado ao chat!";
+        });
+
+        socket.on("disconnect", () => {
+            status.textContent = "Desconectado. Tentando reconectar...";
+        });
+
+        function enviarMensagem() {
+            if (!nome.value.trim() || !texto.value.trim()) {
+                return;
+            }
+
+            socket.emit("mensagem", {
+                nome: nome.value.trim(),
+                texto: texto.value.trim()
+            });
+
+            texto.value = "";
+            texto.focus();
+        }
+
+        document.getElementById("enviar")
+            .addEventListener("click", enviarMensagem);
+
+        texto.addEventListener("keydown", (evento) => {
+            if (evento.key === "Enter") {
+                enviarMensagem();
+            }
+        });
+
+        socket.on("mensagem", (dados) => {
+            const item = document.createElement("li");
+            const nomeMensagem = document.createElement("strong");
+
+            nomeMensagem.textContent = dados.nome + ": ";
+            item.appendChild(nomeMensagem);
+            item.appendChild(document.createTextNode(dados.texto));
+
+            mensagens.appendChild(item);
+            mensagens.scrollTop = mensagens.scrollHeight;
+        });
+    </script>
+</body>
+</html>
